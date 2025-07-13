@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Actualizaciones Roblox AFK Clicker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Actualizaciones Roblox AFK Clicker</h1>
+    <div id="actualizacion">
+        <p>Cargando información de la última versión...</p>
+    </div>
+
+    <script>
+    fetch('latest.json')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('actualizacion').innerHTML = `
+            <h2>Última versión: ${data.version}</h2>
+            <p>Fecha: ${data.date}</p>
+            <p>${data.notes}</p>
+            <a href="${data.url}" target="_blank">Descargar</a>
+        `;
+      })
+      .catch(() => {
+        document.getElementById('actualizacion').innerHTML = "<p>No se pudo cargar la información.</p>";
+      });
+    </script>
+</body>
+</html>
