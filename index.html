@@ -7,23 +7,24 @@
 </head>
 <body>
     <h1>Actualizaciones Roblox AFK Clicker</h1>
-    <div id="actualizacion">
-        <p>Cargando información de la última versión...</p>
+    <div id="actualizaciones">
+        <p>Cargando información de versiones...</p>
     </div>
-
     <script>
-    fetch('latest.json')
+    fetch('versions.json')
       .then(res => res.json())
       .then(data => {
-        document.getElementById('actualizacion').innerHTML = `
-            <h2>Última versión: ${data.version}</h2>
-            <p>Fecha: ${data.date}</p>
-            <p>${data.notes}</p>
-            <a href="${data.url}" target="_blank">Descargar</a>
-        `;
+        document.getElementById('actualizaciones').innerHTML = data.map(ver => `
+            <div class="cuadro">
+                <h2>Versión: ${ver.version}</h2>
+                <p>Fecha: ${ver.date}</p>
+                <p>${ver.notes}</p>
+                <a href="${ver.url}" target="_blank">Descargar</a>
+            </div>
+        `).join('');
       })
       .catch(() => {
-        document.getElementById('actualizacion').innerHTML = "<p>No se pudo cargar la información.</p>";
+        document.getElementById('actualizaciones').innerHTML = "<p>No se pudo cargar la información.</p>";
       });
     </script>
 </body>
