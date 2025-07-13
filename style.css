@@ -4,13 +4,16 @@ body {
     margin: 0;
     padding: 2em;
 }
+
 h1 {
     color: #333;
 }
-#actualizacion {
+
+.cuadro {
     background: #fff;
     padding: 1em;
     border-radius: 8px;
     box-shadow: 0 2px 4px #ccc;
     max-width: 400px;
+    margin-bottom: 1em;
 }
