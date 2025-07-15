@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,54 +6,51 @@
   <title>Versiones de Roblox AFK Clicker</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Sidebar vertical */
+    /* Contenedor principal */
     .container {
       display: flex;
-      max-width: 1000px;
-      margin: 2em auto;
-      gap: 2em;
-    }
-    .sidebar {
-      flex: 0 0 200px;
-      background: #18181b;
-      border-radius: 10px;
-      padding: 1em;
-      box-shadow: 0 2px 16px #000a;
-      display: flex;
       flex-direction: column;
-      gap: 0.5em;
+      max-width: 900px;
+      margin: 2em auto;
+      gap: 1em;
     }
-    .sidebar a {
-      color: #a5b4fc;
-      text-decoration: none;
-      padding: 0.5em;
+    /* Encabezado con menú desplegable a la derecha */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .version-select {
+      background: #18181b;
+      color: #e5e7eb;
+      border: 1px solid #6366f1;
       border-radius: 6px;
-      transition: background 0.2s;
+      padding: 0.5em;
+      font-size: 1em;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #000a;
     }
-    .sidebar a:hover {
+    .version-select option {
       background: #23232a;
-    }
-    .sidebar a.active {
-      background: #6366f1;
-      color: #fff;
-    }
-    .content {
-      flex: 1;
+      color: #e5e7eb;
     }
   </style>
 </head>
 <body>
   <div class="main-container">
-    <h1>Versiones de Roblox AFK Clicker</h1>
     <div class="container">
-      <nav class="sidebar" id="sidebar">
-        <!-- Releases list -->
-      </nav>
-      <div class="content" id="detalle-release">
-        <p class="cargando">Selecciona una versión a la izquierda.</p>
+      <div class="header">
+        <h1>Versiones de Roblox AFK Clicker</h1>
+        <select id="version-select" class="version-select">
+          <option value="">-- Cargando versiones --</option>
+        </select>
+      </div>
+      <div id="detalle-release">
+        <p class="cargando">Selecciona una versión para ver detalles.</p>
       </div>
     </div>
   </div>
+
   <script>
     const TEST_MODE = false;
     const repo = 'VictorGugug/ROAFK';
@@ -75,30 +73,20 @@
         });
 
     fetchPromise.then(data => {
-      const sidebar = document.getElementById('sidebar');
-      const content = document.getElementById('detalle-release');
-      sidebar.innerHTML = '';
-
+      const select = document.getElementById('version-select');
+      select.innerHTML = `<option value="">-- Elige versión --</option>`;
       data.forEach((rel, idx) => {
-        const link = document.createElement('a');
-        link.href = '#';
-        link.textContent = rel.tag_name.replace(/^v/, '');
-        link.dataset.index = idx;
-        link.addEventListener('click', e => {
-          e.preventDefault();
-          document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
-          link.classList.add('active');
-          mostrarRelease(rel);
-        });
-        sidebar.appendChild(link);
+        const label = rel.tag_name.replace(/^v/, '') + ' - ' + (rel.name || 'Release');
+        select.innerHTML += `<option value="${idx}">${label}</option>`;
       });
 
-      // Seleccionar release más reciente (en medio visualmente)
-      const firstLink = sidebar.querySelector('a');
-      if (firstLink) {
-        firstLink.classList.add('active');
-        mostrarRelease(data[0]);
-      }
+      select.addEventListener('change', () => {
+        const rel = data[select.value];
+        mostrarRelease(rel);
+      });
+      // Seleccionar la más reciente por defecto
+      select.selectedIndex = 1;
+      mostrarRelease(data[0]);
     }).catch(err => {
       document.getElementById('detalle-release').innerHTML = `<div class="sin-version"><span class="icon-alerta">⚠️</span><div class="sin-version-titulo">Error cargando releases</div><div class="sin-version-texto">${err.message}</div></div>`;
     });
@@ -115,7 +103,7 @@
       document.getElementById('detalle-release').innerHTML = `
         <div class="versiones-horizontales">
           <div class="cuadro">
-            <h2><a href="${releasePage}" target="_blank">${rel.name || 'Release'}</a> <span class="version-num">${version}</span></h2>
+            <h2><a href="${releasePage}" target="_blank" class="release-link">${rel.name || 'Release'}</a> <span class="version-num">${version}</span></h2>
             <p class="fecha"><span class="icon-fecha">📅</span> <b>Fecha:</b> ${date}</p>
             <p class="notas"><span class="icon-notas">📝</span> ${notes}</p>
             <a class="boton-descarga" href="${downloadUrl}" target="_blank">⬇️ ${assetName}</a>
