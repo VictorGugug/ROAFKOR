@@ -21,7 +21,7 @@
   </div>
 
   <script>
-    // Función para formatear fecha y tiempo transcurrido
+    // Funciones de formato
     function formatDate(dateStr) {
       return new Date(dateStr).toISOString().slice(0, 10);
     }
@@ -33,16 +33,27 @@
       return Math.floor(diff / 86400) + 'd atrás';
     }
 
-    fetch('versions.json')
-      .then(response => response.json())
-      .then(data => {
-        if (!Array.isArray(data) || data.length === 0) {
-          document.getElementById('actualizaciones').innerHTML =
-            '<p class="sin-version">No hay versiones publicadas.</p>';
+    // Cargar releases reales desde GitHub API
+    const apiUrl = 'https://api.github.com/repos/VictorGugug/ROAFK/releases';
+    fetch(apiUrl)
+      .then(res => {
+        if (!res.ok) throw new Error('No se pudo obtener releases.');
+        return res.json();
+      })
+      .then(raw => {
+        const data = raw.map(rel => ({
+          version: rel.tag_name.replace(/^v/, ''),
+          date: rel.published_at,
+          notes: rel.body || 'Sin notas.',
+          url: (rel.assets[0] && rel.assets[0].browser_download_url) || rel.html_url
+        }));
+
+        if (!data.length) {
+          document.getElementById('actualizaciones').innerHTML = '<p class="sin-version">No hay versiones publicadas.</p>';
           return;
         }
 
-        // Ordenar todas las versiones usando semver básico
+        // Orden semver descendente
         data.sort((a, b) => {
           const pa = a.version.split('.').map(n => parseInt(n));
           const pb = b.version.split('.').map(n => parseInt(n));
@@ -55,11 +66,10 @@
         });
 
         const select = document.getElementById('version-select');
-        // Mantener solo el placeholder
+        // Reset opciones (mantener placeholder)
         select.querySelectorAll('option:not([hidden])').forEach(opt => opt.remove());
         select.querySelector('option[hidden]').removeAttribute('hidden');
 
-        // Añadir todas las versiones en orden descendente
         data.forEach(v => {
           const opt = document.createElement('option');
           opt.value = v.version;
@@ -67,7 +77,6 @@
           select.appendChild(opt);
         });
 
-        // Al cambiar, mostrar detalles
         select.addEventListener('change', () => {
           const v = data.find(x => x.version === select.value);
           document.getElementById('actualizaciones').innerHTML =
@@ -79,13 +88,12 @@
             </div>`;
         });
 
-        // Seleccionar y disparar la más reciente
+        // Seleccionar la más reciente
         select.value = data[0].version;
         select.dispatchEvent(new Event('change'));
       })
-      .catch(() => {
-        document.getElementById('actualizaciones').innerHTML =
-          '<p class="sin-version">Error al cargar versiones.</p>';
+      .catch(err => {
+        document.getElementById('actualizaciones').innerHTML = `<p class="sin-version">${err.message}</p>`;
       });
   </script>
 </body>
