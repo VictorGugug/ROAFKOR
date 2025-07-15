@@ -4,86 +4,87 @@
   <meta charset="UTF-8" />
   <title>Actualizaciones Roblox AFK Clicker</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Inline para demo; puedes mover al style.css */
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .version-select {
+      background: #18181b;
+      color: #e5e7eb;
+      border: 1px solid #6366f1;
+      border-radius: 6px;
+      padding: 0.5em;
+      font-size: 1em;
+      cursor: pointer;
+      min-width: 180px;
+    }
+    .version-select option[disabled] {
+      color: #888;
+    }
+  </style>
 </head>
 <body>
-  <button class="sidebar-toggle">≡</button>
-
-  <div class="sidebar" id="sidebar">
-    <h3>Versiones anteriores</h3>
-    <div id="version-list"></div>
-  </div>
-
   <div class="main-container">
-    <h1>Actualizaciones Roblox AFK Clicker</h1>
+    <div class="header-container">
+      <h1>Actualizaciones Roblox AFK Clicker</h1>
+      <select id="version-select" class="version-select">
+        <option disabled selected>Seleccionar versión</option>
+      </select>
+    </div>
     <div id="actualizaciones">
       <p class="cargando">Cargando información de versiones...</p>
     </div>
   </div>
-
   <script>
-    const toggleBtn = document.querySelector(".sidebar-toggle");
-    const sidebar = document.getElementById("sidebar");
-
-    toggleBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("open");
-    });
-
+    function formatDate(dateStr) {
+      return new Date(dateStr).toISOString().slice(0,10);
+    }
+    function timeAgo(dateStr) {
+      const now = Date.now();
+      const past = new Date(dateStr).getTime();
+      const diff = Math.floor((now - past)/1000);
+      if (diff<60) return diff + ' segundos atrás';
+      if (diff<3600) return Math.floor(diff/60) + ' minutos atrás';
+      if (diff<86400) return Math.floor(diff/3600) + ' horas atrás';
+      return Math.floor(diff/86400) + ' días atrás';
+    }
     fetch('versions.json')
-      .then(res => res.json())
-      .then(data => {
-        if (!Array.isArray(data) || data.length === 0) {
-          document.getElementById('actualizaciones').innerHTML = `
-            <div class="sin-version">
-              <span class="icon-alerta">⚠️</span>
-              <div class="sin-version-titulo">No hay versiones actualmente</div>
-              <div class="sin-version-texto">Por favor, espera a una próxima actualización.<br>¡Vuelve pronto!</div>
-            </div>`;
-        } else {
-          const latest = data[0];
-          const releaseDate = new Date(latest.date);
-          const now = new Date();
-          const diffMs = now - releaseDate;
-          let timeAgo = '';
-
-          const diffSec = Math.floor(diffMs / 1000);
-          if (diffSec < 60) {
-            timeAgo = `${diffSec} segundos atrás`;
-          } else if (diffSec < 3600) {
-            timeAgo = `${Math.floor(diffSec / 60)} minutos atrás`;
-          } else if (diffSec < 86400) {
-            timeAgo = `${Math.floor(diffSec / 3600)} horas atrás`;
-          } else {
-            timeAgo = `${Math.floor(diffSec / 86400)} días atrás`;
-          }
-
-          document.getElementById('actualizaciones').innerHTML = `
-            <div class="versiones-horizontales">
-              <div class="cuadro">
-                <h2>Versión <span class="version-num">${latest.version}</span></h2>
-                <p class="fecha"><span class="icon-fecha">📅</span> <b>Fecha:</b> ${latest.date} (${timeAgo})</p>
-                <p class="notas"><span class="icon-notas">📝</span> ${latest.notes}</p>
-                <a class="boton-descarga" href="${latest.url}" target="_blank">⬇️ Descargar</a>
-              </div>
-            </div>
-          `;
-
-          const versionList = document.getElementById('version-list');
-          data.forEach(ver => {
-            const a = document.createElement('a');
-            a.href = `https://github.com/VictorGugug/ROAFK/releases/tag/v${ver.version}`;
-            a.target = "_blank";
-            a.textContent = `v${ver.version}`;
-            versionList.appendChild(a);
-          });
+      .then(r=>r.json())
+      .then(data=>{
+        const sel = document.getElementById('version-select');
+        const container = document.getElementById('actualizaciones');
+        sel.innerHTML = '<option disabled selected>Seleccionar versión</option>';
+        if(!data.length){
+          container.innerHTML = '<div class="sin-version"><span class="icon-alerta">⚠️</span><div class="sin-version-titulo">Sin versiones</div></div>';
+          return;
         }
+        // ordenar mayor a menor
+        data.sort((a,b)=> b.version.localeCompare(a.version, undefined, {numeric:true}));
+        data.forEach(v=>{
+          const opt = document.createElement('option');
+          opt.value = v.version;
+          opt.textContent = v.version;
+          sel.appendChild(opt);
+        });
+        sel.addEventListener('change', ()=>{
+          const v = data.find(x=>x.version===sel.value);
+          container.innerHTML = `
+            <div class="cuadro">
+              <h2><a href="https://github.com/VictorGugug/ROAFK/releases/tag/v${v.version}" class="release-link" target="_blank">Versión ${v.version}</a></h2>
+              <p class="fecha"><span class="icon-fecha">📅</span> ${formatDate(v.date)} (${timeAgo(v.date)})</p>
+              <p class="notas"><span class="icon-notas">📝</span> ${v.notes}</p>
+              <a class="boton-descarga" href="${v.url}" target="_blank">⬇️ Descargar</a>
+            </div>`;
+        });
+        // mostrar la primera por defecto
+        sel.selectedIndex=1;
+        sel.dispatchEvent(new Event('change'));
       })
-      .catch(() => {
-        document.getElementById('actualizaciones').innerHTML = `
-          <div class="sin-version">
-            <span class="icon-alerta">⚠️</span>
-            <div class="sin-version-titulo">No hay versiones actualmente</div>
-            <div class="sin-version-texto">Por favor, espera a una próxima actualización.<br>¡Vuelve pronto!</div>
-          </div>`;
+      .catch(()=>{
+        document.getElementById('actualizaciones').innerHTML = '<div class="sin-version"><span class="icon-alerta">⚠️</span><div class="sin-version-titulo">Error cargando</div></div>';
       });
   </script>
 </body>
