@@ -11,7 +11,7 @@
       <h1>Actualizaciones Roblox AFK Clicker</h1>
       <div class="dropdown">
         <select id="version-select">
-          <option disabled>Seleccionar versión</option>
+          <option value="" disabled selected hidden>Seleccionar versión</option>
         </select>
       </div>
     </div>
@@ -21,32 +21,45 @@
   </div>
 
   <script>
-    function formatDate(dateStr) { return dateStr; }
+    // Función para formatear fecha y tiempo transcurrido
+    function formatDate(dateStr) {
+      return new Date(dateStr).toISOString().slice(0, 10);
+    }
     function timeAgo(dateStr) {
       const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
       if (diff < 60) return diff + 's atrás';
-      if (diff < 3600) return Math.floor(diff/60) + 'm atrás';
-      if (diff < 86400) return Math.floor(diff/3600) + 'h atrás';
-      return Math.floor(diff/86400) + 'd atrás';
+      if (diff < 3600) return Math.floor(diff / 60) + 'm atrás';
+      if (diff < 86400) return Math.floor(diff / 3600) + 'h atrás';
+      return Math.floor(diff / 86400) + 'd atrás';
     }
 
     fetch('versions.json')
       .then(response => response.json())
       .then(data => {
         if (!Array.isArray(data) || data.length === 0) {
-          document.getElementById('actualizaciones').innerHTML = '<p class="sin-version">No hay versiones publicadas.</p>';
+          document.getElementById('actualizaciones').innerHTML =
+            '<p class="sin-version">No hay versiones publicadas.</p>';
           return;
         }
-        // Orden descendente por version numérica
+
+        // Ordenar todas las versiones usando semver básico
         data.sort((a, b) => {
-          const na = parseFloat(a.version);
-          const nb = parseFloat(b.version);
-          return nb - na;
+          const pa = a.version.split('.').map(n => parseInt(n));
+          const pb = b.version.split('.').map(n => parseInt(n));
+          for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+            const na = pa[i] || 0;
+            const nb = pb[i] || 0;
+            if (nb !== na) return nb - na;
+          }
+          return 0;
         });
 
         const select = document.getElementById('version-select');
-        // Remover todas menos primera
-        select.length = 1;
+        // Mantener solo el placeholder
+        select.querySelectorAll('option:not([hidden])').forEach(opt => opt.remove());
+        select.querySelector('option[hidden]').removeAttribute('hidden');
+
+        // Añadir todas las versiones en orden descendente
         data.forEach(v => {
           const opt = document.createElement('option');
           opt.value = v.version;
@@ -54,24 +67,25 @@
           select.appendChild(opt);
         });
 
+        // Al cambiar, mostrar detalles
         select.addEventListener('change', () => {
-          const ver = select.value;
-          const v = data.find(item => item.version === ver);
+          const v = data.find(x => x.version === select.value);
           document.getElementById('actualizaciones').innerHTML =
             `<div class="cuadro">
-              <h2><a href="https://github.com/VictorGugug/ROAFK/releases/tag/v${v.version}" class="release-link" target="_blank">Versión v${v.version}</a><span class="version-num">${v.version}</span></h2>
+              <h2><a href="https://github.com/VictorGugug/ROAFK/releases/tag/v${v.version}" class="release-link" target="_blank">Versión v${v.version}</a> <span class="version-num">${v.version}</span></h2>
               <p class="fecha"><span class="icon-fecha">📅</span> ${formatDate(v.date)} (${timeAgo(v.date)})</p>
               <p class="notas"><span class="icon-notas">📝</span> ${v.notes}</p>
               <a class="boton-descarga" href="${v.url}" target="_blank">⬇️ Descargar</a>
             </div>`;
         });
 
-        // Seleccionar automáticamente la primera opción real
+        // Seleccionar y disparar la más reciente
         select.value = data[0].version;
         select.dispatchEvent(new Event('change'));
       })
       .catch(() => {
-        document.getElementById('actualizaciones').innerHTML = '<p class="sin-version">Error al cargar versiones.</p>';
+        document.getElementById('actualizaciones').innerHTML =
+          '<p class="sin-version">Error al cargar versiones.</p>';
       });
   </script>
 </body>
