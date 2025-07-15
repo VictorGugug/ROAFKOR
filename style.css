@@ -1,3 +1,4 @@
+/* ===== ESTILO GENERAL ===== */
 body {
   font-family: 'Segoe UI', Arial, sans-serif;
   background: linear-gradient(135deg, #18181b 0%, #23272f 100%);
@@ -5,6 +6,7 @@ body {
   padding: 0;
   min-height: 100vh;
   color: #e5e7eb;
+  overflow-x: hidden;
 }
 h1 {
   color: #fff;
@@ -25,26 +27,47 @@ h1 {
   position: relative;
 }
 
-/* Header con select */
+/* Header con dropdown */
 .header-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2em;
+  position: relative;
 }
-.version-select {
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dropdown select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
   background: #18181b;
   color: #e5e7eb;
   border: 1px solid #6366f1;
   border-radius: 6px;
-  padding: 0.5em;
+  padding: 0.5em 2em 0.5em 0.5em;
   font-size: 1em;
   cursor: pointer;
-  min-width: 180px;
   box-shadow: 0 2px 8px #000a;
 }
-.version-select option[disabled] {
-  color: #888;
+.dropdown::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 0.8em;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #e5e7eb;
+  transform: translateY(-50%);
+}
+.dropdown select:focus {
+  outline: none;
+  border-color: #818cf8;
 }
 
 /* Cuadro de versión */
@@ -57,19 +80,22 @@ h1 {
   border-left: 5px solid #6366f1;
   border-bottom: 1px solid #23272f;
   color: #f3f4f6;
+  transition: background 0.2s;
 }
 .cuadro:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 8px 32px #6366f180;
   background: #23232a;
 }
 .cuadro h2 {
   margin: 0 0 0.5em;
   font-size: 1.2em;
   font-weight: 600;
+  color: #a5b4fc;
 }
 .release-link {
   color: #4fc3f7;
+  text-decoration: none;
+}
+.release-link:hover {
   text-decoration: underline;
 }
 .version-num {
@@ -79,7 +105,8 @@ h1 {
   padding: 0.1em 0.5em;
   margin-left: 0.3em;
 }
-.cuadro .fecha, .cuadro .notas {
+.cuadro .fecha,
+.cuadro .notas {
   margin: 0.3em 0;
   color: #d1d5db;
 }
@@ -101,7 +128,8 @@ h1 {
 }
 
 /* Mensajes */
-.sin-version, .cargando {
+.sin-version,
+.cargando {
   color: #a5b4fc;
   font-size: 1.1em;
   margin: 2em 0;
@@ -113,7 +141,7 @@ h1 {
     flex-direction: column;
     gap: 1em;
   }
-  .version-select {
+  .dropdown select {
     width: 100%;
   }
 }
