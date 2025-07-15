@@ -21,7 +21,7 @@
   </div>
 
   <script>
-    // Funciones de formato
+    // Formateo de fecha y tiempo transcurrido
     function formatDate(dateStr) {
       return new Date(dateStr).toISOString().slice(0, 10);
     }
@@ -33,14 +33,14 @@
       return Math.floor(diff / 86400) + 'd atrás';
     }
 
-    // Cargar releases reales desde GitHub API
     const apiUrl = 'https://api.github.com/repos/VictorGugug/ROAFK/releases';
     fetch(apiUrl)
       .then(res => {
-        if (!res.ok) throw new Error('No se pudo obtener releases.');
+        if (!res.ok) throw new Error('No se pudieron obtener las releases.');
         return res.json();
       })
       .then(raw => {
+        // Mapear datos y extraer
         const data = raw.map(rel => ({
           version: rel.tag_name.replace(/^v/, ''),
           date: rel.published_at,
@@ -48,7 +48,7 @@
           url: (rel.assets[0] && rel.assets[0].browser_download_url) || rel.html_url
         }));
 
-        if (!data.length) {
+        if (data.length === 0) {
           document.getElementById('actualizaciones').innerHTML = '<p class="sin-version">No hay versiones publicadas.</p>';
           return;
         }
@@ -66,10 +66,12 @@
         });
 
         const select = document.getElementById('version-select');
-        // Reset opciones (mantener placeholder)
-        select.querySelectorAll('option:not([hidden])').forEach(opt => opt.remove());
-        select.querySelector('option[hidden]').removeAttribute('hidden');
+        // Limpiar opciones salvo placeholder
+        while (select.options.length > 1) {
+          select.remove(1);
+        }
 
+        // Agregar versiones al dropdown
         data.forEach(v => {
           const opt = document.createElement('option');
           opt.value = v.version;
@@ -77,18 +79,20 @@
           select.appendChild(opt);
         });
 
+        // Evento cambio para mostrar detalles
         select.addEventListener('change', () => {
-          const v = data.find(x => x.version === select.value);
+          const selected = select.value;
+          const v = data.find(item => item.version === selected);
           document.getElementById('actualizaciones').innerHTML =
             `<div class="cuadro">
-              <h2><a href="https://github.com/VictorGugug/ROAFK/releases/tag/v${v.version}" class="release-link" target="_blank">Versión v${v.version}</a> <span class="version-num">${v.version}</span></h2>
-              <p class="fecha"><span class="icon-fecha">📅</span> ${formatDate(v.date)} (${timeAgo(v.date)})</p>
-              <p class="notas"><span class="icon-notas">📝</span> ${v.notes}</p>
-              <a class="boton-descarga" href="${v.url}" target="_blank">⬇️ Descargar</a>
-            </div>`;
+               <h2><a href="https://github.com/VictorGugug/ROAFK/releases/tag/v${v.version}" class="release-link" target="_blank">Versión v${v.version}</a> <span class="version-num">${v.version}</span></h2>
+               <p class="fecha"><span class="icon-fecha">📅</span> ${formatDate(v.date)} (${timeAgo(v.date)})</p>
+               <p class="notas"><span class="icon-notas">📝</span> ${v.notes}</p>
+               <a class="boton-descarga" href="${v.url}" target="_blank">⬇️ Descargar</a>
+             </div>`;
         });
 
-        // Seleccionar la más reciente
+        // Seleccionar y mostrar la más reciente
         select.value = data[0].version;
         select.dispatchEvent(new Event('change'));
       })
