@@ -19,18 +19,30 @@ if (fs.existsSync(versionsPath)) {
 }
 
 // Obtener datos de la release desde el contexto de GitHub Actions
+
 const githubEventPath = process.env.GITHUB_EVENT_PATH;
 let assetUrl = '';
 let notes = '';
+let assetName = '';
+let versionTag = release;
 if (githubEventPath && fs.existsSync(githubEventPath)) {
   const event = JSON.parse(fs.readFileSync(githubEventPath, 'utf8'));
   if (event.release) {
     notes = event.release.body || '';
     const asset = event.release.assets && event.release.assets[0];
     if (asset) {
-      assetUrl = asset.browser_download_url;
+      assetName = asset.name;
+    }
+    if (event.release.tag_name) {
+      versionTag = event.release.tag_name;
     }
   }
+}
+
+// URL base del repo de archivos
+const repoBaseUrl = 'https://github.com/VictorGugug/ROAFK/releases/download/';
+if (assetName && versionTag) {
+  assetUrl = `${repoBaseUrl}${versionTag}/${assetName}`;
 }
 
 if (!release) {
