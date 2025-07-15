@@ -11,7 +11,7 @@
       <h1>Actualizaciones Roblox AFK Clicker</h1>
       <div class="dropdown">
         <select id="version-select">
-          <option disabled selected>Seleccionar versión</option>
+          <option disabled>Seleccionar versión</option>
         </select>
       </div>
     </div>
@@ -31,19 +31,32 @@
     }
 
     fetch('versions.json')
-      .then(r => r.json())
+      .then(response => response.json())
       .then(data => {
-        if (!Array.isArray(data) || data.length === 0) return;
-        data.sort((a,b)=> b.version.localeCompare(a.version, undefined, {numeric:true}));
-        const sel = document.getElementById('version-select');
+        if (!Array.isArray(data) || data.length === 0) {
+          document.getElementById('actualizaciones').innerHTML = '<p class="sin-version">No hay versiones publicadas.</p>';
+          return;
+        }
+        // Orden descendente por version numérica
+        data.sort((a, b) => {
+          const na = parseFloat(a.version);
+          const nb = parseFloat(b.version);
+          return nb - na;
+        });
+
+        const select = document.getElementById('version-select');
+        // Remover todas menos primera
+        select.length = 1;
         data.forEach(v => {
           const opt = document.createElement('option');
           opt.value = v.version;
           opt.textContent = 'v' + v.version;
-          sel.appendChild(opt);
+          select.appendChild(opt);
         });
-        sel.addEventListener('change', ()=>{
-          const v = data.find(x=>x.version===sel.value);
+
+        select.addEventListener('change', () => {
+          const ver = select.value;
+          const v = data.find(item => item.version === ver);
           document.getElementById('actualizaciones').innerHTML =
             `<div class="cuadro">
               <h2><a href="https://github.com/VictorGugug/ROAFK/releases/tag/v${v.version}" class="release-link" target="_blank">Versión v${v.version}</a><span class="version-num">${v.version}</span></h2>
@@ -52,8 +65,13 @@
               <a class="boton-descarga" href="${v.url}" target="_blank">⬇️ Descargar</a>
             </div>`;
         });
-        sel.selectedIndex=1;
-        sel.dispatchEvent(new Event('change'));
+
+        // Seleccionar automáticamente la primera opción real
+        select.value = data[0].version;
+        select.dispatchEvent(new Event('change'));
+      })
+      .catch(() => {
+        document.getElementById('actualizaciones').innerHTML = '<p class="sin-version">Error al cargar versiones.</p>';
       });
   </script>
 </body>
