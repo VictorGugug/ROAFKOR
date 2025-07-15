@@ -1,91 +1,119 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <title>Actualizaciones Roblox AFK Clicker</title>
-  <link rel="stylesheet" href="style.css" />
-  <style>
-    /* Inline para demo; puedes mover al style.css */
-    .header-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .version-select {
-      background: #18181b;
-      color: #e5e7eb;
-      border: 1px solid #6366f1;
-      border-radius: 6px;
-      padding: 0.5em;
-      font-size: 1em;
-      cursor: pointer;
-      min-width: 180px;
-    }
-    .version-select option[disabled] {
-      color: #888;
-    }
-  </style>
-</head>
-<body>
-  <div class="main-container">
-    <div class="header-container">
-      <h1>Actualizaciones Roblox AFK Clicker</h1>
-      <select id="version-select" class="version-select">
-        <option disabled selected>Seleccionar versión</option>
-      </select>
-    </div>
-    <div id="actualizaciones">
-      <p class="cargando">Cargando información de versiones...</p>
-    </div>
-  </div>
-  <script>
-    function formatDate(dateStr) {
-      return new Date(dateStr).toISOString().slice(0,10);
-    }
-    function timeAgo(dateStr) {
-      const now = Date.now();
-      const past = new Date(dateStr).getTime();
-      const diff = Math.floor((now - past)/1000);
-      if (diff<60) return diff + ' segundos atrás';
-      if (diff<3600) return Math.floor(diff/60) + ' minutos atrás';
-      if (diff<86400) return Math.floor(diff/3600) + ' horas atrás';
-      return Math.floor(diff/86400) + ' días atrás';
-    }
-    fetch('versions.json')
-      .then(r=>r.json())
-      .then(data=>{
-        const sel = document.getElementById('version-select');
-        const container = document.getElementById('actualizaciones');
-        sel.innerHTML = '<option disabled selected>Seleccionar versión</option>';
-        if(!data.length){
-          container.innerHTML = '<div class="sin-version"><span class="icon-alerta">⚠️</span><div class="sin-version-titulo">Sin versiones</div></div>';
-          return;
-        }
-        // ordenar mayor a menor
-        data.sort((a,b)=> b.version.localeCompare(a.version, undefined, {numeric:true}));
-        data.forEach(v=>{
-          const opt = document.createElement('option');
-          opt.value = v.version;
-          opt.textContent = v.version;
-          sel.appendChild(opt);
-        });
-        sel.addEventListener('change', ()=>{
-          const v = data.find(x=>x.version===sel.value);
-          container.innerHTML = `
-            <div class="cuadro">
-              <h2><a href="https://github.com/VictorGugug/ROAFK/releases/tag/v${v.version}" class="release-link" target="_blank">Versión ${v.version}</a></h2>
-              <p class="fecha"><span class="icon-fecha">📅</span> ${formatDate(v.date)} (${timeAgo(v.date)})</p>
-              <p class="notas"><span class="icon-notas">📝</span> ${v.notes}</p>
-              <a class="boton-descarga" href="${v.url}" target="_blank">⬇️ Descargar</a>
-            </div>`;
-        });
-        // mostrar la primera por defecto
-        sel.selectedIndex=1;
-        sel.dispatchEvent(new Event('change'));
-      })
-      .catch(()=>{
-        document.getElementById('actualizaciones').innerHTML = '<div class="sin-version"><span class="icon-alerta">⚠️</span><div class="sin-version-titulo">Error cargando</div></div>';
-      });
-  </script>
-</body>
-</html>
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(135deg, #18181b 0%, #23272f 100%);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  color: #e5e7eb;
+}
+h1 {
+  color: #fff;
+  margin: 0;
+  font-size: 2em;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 8px #000a;
+}
+.main-container {
+  max-width: 900px;
+  margin: 3em auto;
+  background: #111114;
+  border-radius: 18px;
+  box-shadow: 0 6px 32px #000a;
+  padding: 2.5em;
+  text-align: center;
+  border: 1.5px solid #23272f;
+  position: relative;
+}
+
+/* Header con select */
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2em;
+}
+.version-select {
+  background: #18181b;
+  color: #e5e7eb;
+  border: 1px solid #6366f1;
+  border-radius: 6px;
+  padding: 0.5em;
+  font-size: 1em;
+  cursor: pointer;
+  min-width: 180px;
+  box-shadow: 0 2px 8px #000a;
+}
+.version-select option[disabled] {
+  color: #888;
+}
+
+/* Cuadro de versión */
+.cuadro {
+  background: #18181b;
+  padding: 1.3em;
+  border-radius: 14px;
+  box-shadow: 0 2px 16px #000a;
+  text-align: left;
+  border-left: 5px solid #6366f1;
+  border-bottom: 1px solid #23272f;
+  color: #f3f4f6;
+}
+.cuadro:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 32px #6366f180;
+  background: #23232a;
+}
+.cuadro h2 {
+  margin: 0 0 0.5em;
+  font-size: 1.2em;
+  font-weight: 600;
+}
+.release-link {
+  color: #4fc3f7;
+  text-decoration: underline;
+}
+.version-num {
+  background: #6366f1;
+  color: #fff;
+  border-radius: 6px;
+  padding: 0.1em 0.5em;
+  margin-left: 0.3em;
+}
+.cuadro .fecha, .cuadro .notas {
+  margin: 0.3em 0;
+  color: #d1d5db;
+}
+.boton-descarga {
+  display: inline-block;
+  margin-top: 0.7em;
+  padding: 0.5em 1.2em;
+  background: linear-gradient(90deg, #6366f1 60%, #818cf8 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  box-shadow: 0 2px 8px #6366f140;
+  transition: background 0.2s;
+}
+.boton-descarga:hover {
+  background: linear-gradient(90deg, #818cf8 60%, #6366f1 100%);
+}
+
+/* Mensajes */
+.sin-version, .cargando {
+  color: #a5b4fc;
+  font-size: 1.1em;
+  margin: 2em 0;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .header-container {
+    flex-direction: column;
+    gap: 1em;
+  }
+  .version-select {
+    width: 100%;
+  }
+}
