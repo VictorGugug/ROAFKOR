@@ -1,84 +1,84 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Versiones de Roblox AFK Clicker</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Actualizaciones Roblox AFK Clicker</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
   <div class="main-container">
-    <div class="container">
-      <div class="header">
-        <h1>Versiones de Roblox AFK Clicker</h1>
-        <select id="version-select" class="version-select">
-          <option value="">-- Cargando versiones --</option>
-        </select>
-      </div>
-      <div id="detalle-release">
-        <p class="cargando">Selecciona una versión para ver detalles.</p>
-      </div>
+    <h1>Actualizaciones Roblox AFK Clicker</h1>
+    <div id="actualizaciones">
+      <p class="cargando">Cargando información de versiones...</p>
+    </div>
+
+    <!-- Botón para abrir/cerrar sidebar -->
+    <button class="sidebar-toggle">≡</button>
+
+    <!-- Sidebar de versiones -->
+    <div class="sidebar" id="sidebar">
+      <h3>Versiones anteriores</h3>
+      <div id="version-list"></div>
     </div>
   </div>
 
   <script>
-    const TEST_MODE = false;
-    const repo = 'VictorGugug/ROAFK';
-    const apiUrl = `https://api.github.com/repos/${repo}/releases`;
-
-    const testData = [
-      { tag_name: 'v1.2.3', name: 'Versión 1.2.3', body: 'Notas de prueba.', html_url: 'https://github.com/VictorGugug/ROAFK/releases/tag/v1.2.3', published_at: '2025-07-15T12:00:00Z', assets: [{ browser_download_url: 'https://github.com/VictorGugug/ROAFK/releases/download/v1.2.3/ROAFK.zip', name: 'ROAFK.zip' }] },
-      { tag_name: 'v1.2.2', name: 'Versión 1.2.2', body: 'Notas antiguas.', html_url: 'https://github.com/VictorGugug/ROAFK/releases/tag/v1.2.2', published_at: '2025-07-01T08:30:00Z', assets: [{ browser_download_url: 'https://github.com/VictorGugug/ROAFK/releases/download/v1.2.2/ROAFK.zip', name: 'ROAFK.zip' }] }
-    ];
-
-    function formatDate(iso) {
-      return new Date(iso).toISOString().slice(0, 10);
+    function tiempoTranscurrido(fecha) {
+      const ahora = new Date();
+      const f = new Date(fecha);
+      const diff = Math.floor((ahora - f) / 1000);
+      if (diff < 60) return `${diff} segundos`;
+      if (diff < 3600) return `${Math.floor(diff / 60)} minutos`;
+      if (diff < 86400) return `${Math.floor(diff / 3600)} horas`;
+      return `${Math.floor(diff / 86400)} días`;
     }
 
-    const fetchPromise = TEST_MODE
-      ? Promise.resolve(testData)
-      : fetch(apiUrl).then(res => {
-          if (!res.ok) throw new Error('Error API GitHub');
-          return res.json();
-        });
+    fetch('versions.json')
+      .then(res => res.json())
+      .then(data => {
+        if (!Array.isArray(data) || data.length === 0) {
+          document.getElementById('actualizaciones').innerHTML = `
+            <div class="sin-version">
+              <span class="icon-alerta">⚠️</span>
+              <div class="sin-version-titulo">No hay versiones actualmente</div>
+              <div class="sin-version-texto">Por favor, espera a una próxima actualización.<br>¡Vuelve pronto!</div>
+            </div>
+          `;
+        } else {
+          const main = data[0];
+          document.getElementById('actualizaciones').innerHTML = `
+            <div class="cuadro">
+              <h2>Versión <span class="version-num">${main.version}</span></h2>
+              <p class="fecha"><span class="icon-fecha">📅</span> ${main.date} (${tiempoTranscurrido(main.date)} atrás)</p>
+              <p class="notas"><span class="icon-notas">📝</span> ${main.notes}</p>
+              <a class="boton-descarga" href="${main.url}" target="_blank">⬇️ Descargar</a>
+            </div>
+          `;
 
-    fetchPromise.then(data => {
-      const select = document.getElementById('version-select');
-      select.innerHTML = `<option value="">-- Elige versión --</option>`;
-      data.forEach((rel, idx) => {
-        const label = rel.tag_name.replace(/^v/, '') + ' - ' + (rel.name || 'Release');
-        select.innerHTML += `<option value="${idx}">${label}</option>`;
-      });
+          const versions = data.slice(1).map(v => `
+            <a href="${v.url}" target="_blank">${v.version} — ${tiempoTranscurrido(v.date)} atrás</a>
+          `).join('');
 
-      select.addEventListener('change', () => {
-        const rel = data[select.value];
-        mostrarRelease(rel);
-      });
-      select.selectedIndex = 1;
-      mostrarRelease(data[0]);
-    }).catch(err => {
-      document.getElementById('detalle-release').innerHTML = `<div class="sin-version"><span class="icon-alerta">⚠️</span><div class="sin-version-titulo">Error cargando releases</div><div class="sin-version-texto">${err.message}</div></div>`;
-    });
-
-    function mostrarRelease(rel) {
-      const version = rel.tag_name.replace(/^v/, '');
-      const notes = rel.body || 'Sin notas.';
-      const date = formatDate(rel.published_at);
-      const asset = (rel.assets && rel.assets[0]);
-      const downloadUrl = asset ? asset.browser_download_url : '#';
-      const assetName = asset ? asset.name : 'Descargar';
-      const releasePage = rel.html_url;
-
-      document.getElementById('detalle-release').innerHTML = `
-        <div class="versiones-horizontales">
-          <div class="cuadro">
-            <h2><a href="${releasePage}" target="_blank" class="release-link">${rel.name || 'Release'}</a> <span class="version-num">${version}</span></h2>
-            <p class="fecha"><span class="icon-fecha">📅</span> <b>Fecha:</b> ${date}</p>
-            <p class="notas"><span class="icon-notas">📝</span> ${notes}</p>
-            <a class="boton-descarga" href="${downloadUrl}" target="_blank">⬇️ ${assetName}</a>
+          document.getElementById('version-list').innerHTML = versions;
+        }
+      })
+      .catch(() => {
+        document.getElementById('actualizaciones').innerHTML = `
+          <div class="sin-version">
+            <span class="icon-alerta">⚠️</span>
+            <div class="sin-version-titulo">No hay versiones actualmente</div>
+            <div class="sin-version-texto">Por favor, espera a una próxima actualización.<br>¡Vuelve pronto!</div>
           </div>
-        </div>
-      `;
-    }
+        `;
+      });
+
+    const sidebar = document.getElementById('sidebar');
+    const toggle = document.querySelector('.sidebar-toggle');
+    toggle.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+    });
   </script>
+
 </body>
 </html>
