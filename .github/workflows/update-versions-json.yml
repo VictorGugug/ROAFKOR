@@ -1,0 +1,29 @@
+name: Actualizar versions.json al crear release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  update-versions-json:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Actualizar versions.json
+        run: |
+          node .github/scripts/update-versions-json.js
+
+      - name: Commit y push de versions.json
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Actualizar versions.json por nueva release
+          file_pattern: versions.json

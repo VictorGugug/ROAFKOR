@@ -6,25 +6,43 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Actualizaciones Roblox AFK Clicker</h1>
-    <div id="actualizaciones">
-        <p>Cargando información de versiones...</p>
+    <div class="main-container">
+        <h1>Actualizaciones Roblox AFK Clicker</h1>
+        <div id="actualizaciones">
+            <p class="cargando">Cargando información de versiones...</p>
+        </div>
     </div>
     <script>
     fetch('versions.json')
       .then(res => res.json())
       .then(data => {
-        document.getElementById('actualizaciones').innerHTML = data.map(ver => `
-            <div class="cuadro">
-                <h2>Versión: ${ver.version}</h2>
-                <p>Fecha: ${ver.date}</p>
-                <p>${ver.notes}</p>
-                <a href="${ver.url}" target="_blank">Descargar</a>
+        if (!Array.isArray(data) || data.length === 0) {
+          document.getElementById('actualizaciones').innerHTML = `
+            <div class="sin-version">
+              <span class="icon-alerta">⚠️</span>
+              <div class="sin-version-titulo">No hay versiones actualmente</div>
+              <div class="sin-version-texto">Por favor, espera a una próxima actualización.<br>¡Vuelve pronto!</div>
             </div>
-        `).join('');
+          `;
+        } else {
+          document.getElementById('actualizaciones').innerHTML = data.map(ver => `
+              <div class="cuadro">
+                  <h2>Versión <span class="version-num">${ver.version}</span></h2>
+                  <p class="fecha"><span class="icon-fecha">📅</span> <b>Fecha:</b> ${ver.date}</p>
+                  <p class="notas"><span class="icon-notas">📝</span> ${ver.notes}</p>
+                  <a class="boton-descarga" href="${ver.url}" target="_blank">⬇️ Descargar</a>
+              </div>
+          `).join('');
+        }
       })
       .catch(() => {
-        document.getElementById('actualizaciones').innerHTML = "<p>No se pudo cargar la información.</p>";
+        document.getElementById('actualizaciones').innerHTML = `
+          <div class="sin-version">
+            <span class="icon-alerta">⚠️</span>
+            <div class="sin-version-titulo">No hay versiones actualmente</div>
+            <div class="sin-version-texto">Por favor, espera a una próxima actualización.<br>¡Vuelve pronto!</div>
+          </div>
+        `;
       });
     </script>
 </body>
