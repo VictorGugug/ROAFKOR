@@ -1,40 +1,9 @@
-```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <title>Versiones de Roblox AFK Clicker</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    /* Contenedor principal */
-    .container {
-      display: flex;
-      flex-direction: column;
-      max-width: 900px;
-      margin: 2em auto;
-      gap: 1em;
-    }
-    /* Encabezado con menú desplegable a la derecha */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .version-select {
-      background: #18181b;
-      color: #e5e7eb;
-      border: 1px solid #6366f1;
-      border-radius: 6px;
-      padding: 0.5em;
-      font-size: 1em;
-      cursor: pointer;
-      box-shadow: 0 2px 8px #000a;
-    }
-    .version-select option {
-      background: #23232a;
-      color: #e5e7eb;
-    }
-  </style>
 </head>
 <body>
   <div class="main-container">
@@ -84,7 +53,6 @@
         const rel = data[select.value];
         mostrarRelease(rel);
       });
-      // Seleccionar la más reciente por defecto
       select.selectedIndex = 1;
       mostrarRelease(data[0]);
     }).catch(err => {
