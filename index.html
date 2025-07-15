@@ -6,33 +6,27 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <button class="sidebar-toggle">≡</button>
+
+  <div class="sidebar" id="sidebar">
+    <h3>Versiones anteriores</h3>
+    <div id="version-list"></div>
+  </div>
 
   <div class="main-container">
     <h1>Actualizaciones Roblox AFK Clicker</h1>
     <div id="actualizaciones">
       <p class="cargando">Cargando información de versiones...</p>
     </div>
-
-    <!-- Botón para abrir/cerrar sidebar -->
-    <button class="sidebar-toggle">≡</button>
-
-    <!-- Sidebar de versiones -->
-    <div class="sidebar" id="sidebar">
-      <h3>Versiones anteriores</h3>
-      <div id="version-list"></div>
-    </div>
   </div>
 
   <script>
-    function tiempoTranscurrido(fecha) {
-      const ahora = new Date();
-      const f = new Date(fecha);
-      const diff = Math.floor((ahora - f) / 1000);
-      if (diff < 60) return `${diff} segundos`;
-      if (diff < 3600) return `${Math.floor(diff / 60)} minutos`;
-      if (diff < 86400) return `${Math.floor(diff / 3600)} horas`;
-      return `${Math.floor(diff / 86400)} días`;
-    }
+    const toggleBtn = document.querySelector(".sidebar-toggle");
+    const sidebar = document.getElementById("sidebar");
+
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("open");
+    });
 
     fetch('versions.json')
       .then(res => res.json())
@@ -43,24 +37,44 @@
               <span class="icon-alerta">⚠️</span>
               <div class="sin-version-titulo">No hay versiones actualmente</div>
               <div class="sin-version-texto">Por favor, espera a una próxima actualización.<br>¡Vuelve pronto!</div>
-            </div>
-          `;
+            </div>`;
         } else {
-          const main = data[0];
+          const latest = data[0];
+          const releaseDate = new Date(latest.date);
+          const now = new Date();
+          const diffMs = now - releaseDate;
+          let timeAgo = '';
+
+          const diffSec = Math.floor(diffMs / 1000);
+          if (diffSec < 60) {
+            timeAgo = `${diffSec} segundos atrás`;
+          } else if (diffSec < 3600) {
+            timeAgo = `${Math.floor(diffSec / 60)} minutos atrás`;
+          } else if (diffSec < 86400) {
+            timeAgo = `${Math.floor(diffSec / 3600)} horas atrás`;
+          } else {
+            timeAgo = `${Math.floor(diffSec / 86400)} días atrás`;
+          }
+
           document.getElementById('actualizaciones').innerHTML = `
-            <div class="cuadro">
-              <h2>Versión <span class="version-num">${main.version}</span></h2>
-              <p class="fecha"><span class="icon-fecha">📅</span> ${main.date} (${tiempoTranscurrido(main.date)} atrás)</p>
-              <p class="notas"><span class="icon-notas">📝</span> ${main.notes}</p>
-              <a class="boton-descarga" href="${main.url}" target="_blank">⬇️ Descargar</a>
+            <div class="versiones-horizontales">
+              <div class="cuadro">
+                <h2>Versión <span class="version-num">${latest.version}</span></h2>
+                <p class="fecha"><span class="icon-fecha">📅</span> <b>Fecha:</b> ${latest.date} (${timeAgo})</p>
+                <p class="notas"><span class="icon-notas">📝</span> ${latest.notes}</p>
+                <a class="boton-descarga" href="${latest.url}" target="_blank">⬇️ Descargar</a>
+              </div>
             </div>
           `;
 
-          const versions = data.slice(1).map(v => `
-            <a href="${v.url}" target="_blank">${v.version} — ${tiempoTranscurrido(v.date)} atrás</a>
-          `).join('');
-
-          document.getElementById('version-list').innerHTML = versions;
+          const versionList = document.getElementById('version-list');
+          data.forEach(ver => {
+            const a = document.createElement('a');
+            a.href = `https://github.com/VictorGugug/ROAFK/releases/tag/v${ver.version}`;
+            a.target = "_blank";
+            a.textContent = `v${ver.version}`;
+            versionList.appendChild(a);
+          });
         }
       })
       .catch(() => {
@@ -69,16 +83,8 @@
             <span class="icon-alerta">⚠️</span>
             <div class="sin-version-titulo">No hay versiones actualmente</div>
             <div class="sin-version-texto">Por favor, espera a una próxima actualización.<br>¡Vuelve pronto!</div>
-          </div>
-        `;
+          </div>`;
       });
-
-    const sidebar = document.getElementById('sidebar');
-    const toggle = document.querySelector('.sidebar-toggle');
-    toggle.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
-    });
   </script>
-
 </body>
 </html>
