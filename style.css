@@ -1,7 +1,7 @@
 /* --- Fondo y texto base --- */
 body {
-  background-color: #fff;
-  color: #24292e; /* color texto oscuro estilo GitHub */
+  background-color: #0d1117;
+  color: #c9d1d9;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
   line-height: 1.5;
   margin: 20px;
@@ -12,7 +12,7 @@ body {
   max-width: 720px;
   margin: 0 auto;
   padding: 20px;
-  background-color: #fff;
+  background-color: #0d1117;
 }
 
 /* --- Encabezados (h1-h6) --- */
@@ -20,17 +20,16 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   margin-top: 1.5em;
   margin-bottom: 0.5em;
-  color: #24292e;
+  color: #c9d1d9;
   line-height: 1.25;
 }
 
-/* Tamaños aproximados como GitHub */
-h1 { font-size: 2em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
-h2 { font-size: 1.5em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
+h1 { font-size: 2em; border-bottom: 1px solid #30363d; padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid #30363d; padding-bottom: 0.3em; }
 h3 { font-size: 1.25em; }
 h4 { font-size: 1em; }
 h5 { font-size: 0.875em; }
-h6 { font-size: 0.85em; color: #6a737d; }
+h6 { font-size: 0.85em; color: #8b949e; }
 
 /* --- Párrafos --- */
 p {
@@ -40,7 +39,7 @@ p {
 
 /* --- Enlaces --- */
 a {
-  color: #0969da;
+  color: #58a6ff;
   text-decoration: none;
   cursor: pointer;
 }
@@ -61,8 +60,8 @@ li + li {
 
 /* --- Código en línea --- */
 code {
-  background-color: #f6f8fa;
-  color: #cf222e;
+  background-color: #161b22;
+  color: #ff7b72;
   padding: 0.2em 0.4em;
   margin: 0;
   font-size: 85%;
@@ -72,7 +71,7 @@ code {
 
 /* --- Bloques de código --- */
 pre {
-  background-color: #f6f8fa;
+  background-color: #161b22;
   padding: 1em;
   overflow: auto;
   font-size: 85%;
@@ -81,12 +80,11 @@ pre {
   margin-top: 0;
   margin-bottom: 1em;
   font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
-  color: #24292e;
-  border: 1px solid #d0d7de;
-  white-space: pre-wrap; /* para romper líneas largas */
+  color: #c9d1d9;
+  border: 1px solid #30363d;
+  white-space: pre-wrap;
 }
 
-/* Para que el contenido de pre incluya code */
 pre > code {
   background: transparent;
   padding: 0;
@@ -100,8 +98,8 @@ pre > code {
 blockquote {
   margin: 0 0 1em;
   padding-left: 1em;
-  color: #6a737d;
-  border-left: 0.25em solid #d0d7de;
+  color: #8b949e;
+  border-left: 0.25em solid #30363d;
 }
 
 /* --- Tablas --- */
@@ -110,13 +108,14 @@ table {
   border-collapse: collapse;
   margin-bottom: 1em;
   font-size: 85%;
+  color: #c9d1d9;
 }
 th, td {
-  border: 1px solid #d0d7de;
+  border: 1px solid #30363d;
   padding: 6px 13px;
 }
 th {
-  background-color: #f6f8fa;
+  background-color: #161b22;
   font-weight: 600;
   text-align: left;
 }
@@ -124,33 +123,32 @@ th {
 /* --- Negritas y cursivas --- */
 strong, b {
   font-weight: 600;
-  color: #24292e;
+  color: #c9d1d9;
 }
 
 em, i {
   font-style: italic;
-  color: #6a737d;
+  color: #8b949e;
 }
 
-/* --- Contenedor para contenido truncado (tú ya lo tienes) --- */
+/* --- Contenedor para contenido truncado --- */
 .notas-markdown-container {
   position: relative;
 }
 
-/* --- Markdown común para el contenedor (tú ya lo tienes con ajustes) --- */
 .notas-markdown {
   white-space: pre-wrap;
   line-height: 1.5em;
   max-width: 100%;
-  color: #24292e;
+  color: #c9d1d9;
 }
 
-/* Botón "Ver más / Ver menos" (tú lo tienes, solo un ligero ajuste) */
+/* Botón "Ver más / Ver menos" */
 .ver-mas-btn {
   margin-top: 0.5em;
   background-color: transparent;
   border: none;
-  color: #0969da;
+  color: #58a6ff;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.9em;
@@ -159,7 +157,7 @@ em, i {
   padding: 0;
 }
 .ver-mas-btn:hover {
-  color: #054ab8;
+  color: #1f6feb;
 }
 
 /* Extras para íconos en fechas y notas */
@@ -170,9 +168,9 @@ em, i {
 /* Estilo para el cuadro que contiene cada versión */
 .cuadro {
   padding: 15px 20px;
-  border: 1px solid #e1e4e8;
+  border: 1px solid #30363d;
   border-radius: 8px;
-  background-color: #fafbfc;
+  background-color: #161b22;
   margin-top: 20px;
 }
 
@@ -181,7 +179,7 @@ em, i {
   display: inline-block;
   margin-top: 15px;
   padding: 8px 16px;
-  background-color: #2ea44f;
+  background-color: #238636;
   color: white;
   font-weight: 600;
   border-radius: 6px;
@@ -189,7 +187,7 @@ em, i {
   transition: background-color 0.3s;
 }
 .boton-descarga:hover {
-  background-color: #22863a;
+  background-color: #2ea043;
 }
 
 /* Select versión */
@@ -197,9 +195,9 @@ select#version-select {
   padding: 8px 12px;
   font-size: 1em;
   border-radius: 6px;
-  border: 1px solid #d0d7de;
-  background-color: white;
-  color: #24292e;
+  border: 1px solid #30363d;
+  background-color: #0d1117;
+  color: #c9d1d9;
   cursor: pointer;
 }
 
