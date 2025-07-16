@@ -20,9 +20,6 @@
     </div>
   </div>
 
-  <!-- Incluir marked.js para parsear Markdown -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
   <script>
     // Formateo de fecha y tiempo transcurrido
     function formatDate(dateStr) {
@@ -36,44 +33,6 @@
       return Math.floor(diff / 86400) + 'd atrás';
     }
 
-    // Función para truncar texto y crear botón "Ver más / Ver menos"
-    function createExpandableMarkdown(htmlContent, maxHeight = 200) {
-      // Crear contenedor
-      const container = document.createElement('div');
-      container.className = 'notas-markdown-container';
-
-      // Contenido markdown parseado
-      const contentDiv = document.createElement('div');
-      contentDiv.className = 'notas-markdown';
-      contentDiv.innerHTML = htmlContent;
-      container.appendChild(contentDiv);
-
-      // Si el contenido es muy alto, agregar botón para expandir
-      if (contentDiv.scrollHeight > maxHeight) {
-        contentDiv.style.maxHeight = maxHeight + 'px';
-        contentDiv.style.overflow = 'hidden';
-
-        const btn = document.createElement('button');
-        btn.className = 'ver-mas-btn';
-        btn.textContent = 'Ver más';
-
-        btn.onclick = () => {
-          if (btn.textContent === 'Ver más') {
-            contentDiv.style.maxHeight = 'none';
-            btn.textContent = 'Ver menos';
-          } else {
-            contentDiv.style.maxHeight = maxHeight + 'px';
-            btn.textContent = 'Ver más';
-            contentDiv.scrollIntoView({behavior: 'smooth'});
-          }
-        };
-
-        container.appendChild(btn);
-      }
-
-      return container;
-    }
-
     const apiUrl = 'https://api.github.com/repos/VictorGugug/ROAFK/releases';
     fetch(apiUrl)
       .then(res => {
@@ -81,6 +40,7 @@
         return res.json();
       })
       .then(raw => {
+        // Mapear datos y extraer
         const data = raw.map(rel => ({
           version: rel.tag_name.replace(/^v/, ''),
           date: rel.published_at,
@@ -106,10 +66,12 @@
         });
 
         const select = document.getElementById('version-select');
+        // Limpiar opciones salvo placeholder
         while (select.options.length > 1) {
           select.remove(1);
         }
 
+        // Agregar versiones al dropdown
         data.forEach(v => {
           const opt = document.createElement('option');
           opt.value = v.version;
@@ -117,45 +79,20 @@
           select.appendChild(opt);
         });
 
+        // Evento cambio para mostrar detalles
         select.addEventListener('change', () => {
           const selected = select.value;
           const v = data.find(item => item.version === selected);
-
-          // Parsear notas Markdown a HTML
-          const notasHtml = marked.parse(v.notes);
-
-          const container = document.createElement('div');
-          container.className = 'cuadro';
-
-          container.innerHTML = `
-            <h2>
-              <a href="https://github.com/VictorGugug/ROAFK/releases/tag/v${v.version}" class="release-link" target="_blank">
-                Versión v${v.version}
-              </a> 
-              <span class="version-num">${v.version}</span>
-            </h2>
-            <p class="fecha"><span class="icon-fecha">📅</span> ${formatDate(v.date)} (${timeAgo(v.date)})</p>
-            <p class="notas"><span class="icon-notas">📝</span></p>
-          `;
-
-          // Insertar notas con posible truncamiento
-          const notasContainer = createExpandableMarkdown(notasHtml);
-          container.appendChild(notasContainer);
-
-          const botonDescarga = document.createElement('a');
-          botonDescarga.className = 'boton-descarga';
-          botonDescarga.href = v.url;
-          botonDescarga.target = '_blank';
-          botonDescarga.textContent = '⬇️ Descargar';
-
-          container.appendChild(botonDescarga);
-
-          const actualizacionesDiv = document.getElementById('actualizaciones');
-          actualizacionesDiv.innerHTML = '';
-          actualizacionesDiv.appendChild(container);
+          document.getElementById('actualizaciones').innerHTML =
+            `<div class="cuadro">
+               <h2><a href="https://github.com/VictorGugug/ROAFK/releases/tag/v${v.version}" class="release-link" target="_blank">Versión v${v.version}</a> <span class="version-num">${v.version}</span></h2>
+               <p class="fecha"><span class="icon-fecha">📅</span> ${formatDate(v.date)} (${timeAgo(v.date)})</p>
+               <p class="notas"><span class="icon-notas">📝</span> ${v.notes}</p>
+               <a class="boton-descarga" href="${v.url}" target="_blank">⬇️ Descargar</a>
+             </div>`;
         });
 
-        // Mostrar versión más reciente por defecto
+        // Seleccionar y mostrar la más reciente
         select.value = data[0].version;
         select.dispatchEvent(new Event('change'));
       })
