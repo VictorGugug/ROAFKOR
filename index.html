@@ -1,68 +1,167 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Texto Colapsable con Estilo</title>
-  <style>
-    body {
-      background-color: #f0f0f0;
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-
-    .texto-container {
-      background-color: #ffffff;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 15px;
-      max-width: 600px;
-      margin: 0 auto;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-
-    .texto-content {
-      font-size: 16px;
-      color: #333;
-      max-height: 80px;
-      overflow: hidden;
-      position: relative;
-      transition: max-height 0.3s ease;
-    }
-
-    .texto-content.expandido {
-      max-height: 1000px;
-      font-size: 14px;
-    }
-
-    .ver-mas {
-      display: inline-block;
-      margin-top: 10px;
-      background-color: #007BFF;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <title>Actualizaciones Roblox AFK Clicker</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="texto-container">
-    <div id="texto" class="texto-content">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget co... (aquí va el texto largo que se cortará). Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec mi vitae erat placerat scelerisque. Vestibulum laoreet lectus non dolor cursus, nec scelerisque metus pulvinar. Pellentesque id consequat nisi. Mauris a imperdiet justo, sed congue diam. Donec et erat eget justo rutrum pretium. Aliquam erat volutpat. Curabitur non sapien non libero rhoncus laoreet nec nec orci. Praesent rutrum justo sed blandit ultrices.
+  <div class="main-container">
+    <div class="header-container">
+      <h1>Actualizaciones Roblox AFK Clicker</h1>
+      <div class="dropdown">
+        <select id="version-select">
+          <option value="" disabled selected hidden>Seleccionar versión</option>
+        </select>
+      </div>
     </div>
-    <button class="ver-mas" onclick="toggleVerMas()">Ver más</button>
+    <div id="actualizaciones">
+      <p class="cargando">Cargando información de versiones...</p>
+    </div>
   </div>
 
+  <!-- Incluir marked.js para parsear Markdown -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
   <script>
-    function toggleVerMas() {
-      const texto = document.getElementById("texto");
-      texto.classList.toggle("expandido");
-      const boton = document.querySelector(".ver-mas");
-      boton.textContent = texto.classList.contains("expandido") ? "Ver menos" : "Ver más";
+    // Formateo de fecha y tiempo transcurrido
+    function formatDate(dateStr) {
+      return new Date(dateStr).toISOString().slice(0, 10);
     }
+    function timeAgo(dateStr) {
+      const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
+      if (diff < 60) return diff + 's atrás';
+      if (diff < 3600) return Math.floor(diff / 60) + 'm atrás';
+      if (diff < 86400) return Math.floor(diff / 3600) + 'h atrás';
+      return Math.floor(diff / 86400) + 'd atrás';
+    }
+
+    // Función para truncar texto y crear botón "Ver más / Ver menos"
+    function createExpandableMarkdown(htmlContent, maxHeight = 200) {
+      // Crear contenedor
+      const container = document.createElement('div');
+      container.className = 'notas-markdown-container';
+
+      // Contenido markdown parseado
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'notas-markdown';
+      contentDiv.innerHTML = htmlContent;
+      container.appendChild(contentDiv);
+
+      // Si el contenido es muy alto, agregar botón para expandir
+      if (contentDiv.scrollHeight > maxHeight) {
+        contentDiv.style.maxHeight = maxHeight + 'px';
+        contentDiv.style.overflow = 'hidden';
+
+        const btn = document.createElement('button');
+        btn.className = 'ver-mas-btn';
+        btn.textContent = 'Ver más';
+
+        btn.onclick = () => {
+          if (btn.textContent === 'Ver más') {
+            contentDiv.style.maxHeight = 'none';
+            btn.textContent = 'Ver menos';
+          } else {
+            contentDiv.style.maxHeight = maxHeight + 'px';
+            btn.textContent = 'Ver más';
+            contentDiv.scrollIntoView({behavior: 'smooth'});
+          }
+        };
+
+        container.appendChild(btn);
+      }
+
+      return container;
+    }
+
+    const apiUrl = 'https://api.github.com/repos/VictorGugug/ROAFK/releases';
+    fetch(apiUrl)
+      .then(res => {
+        if (!res.ok) throw new Error('No se pudieron obtener las releases.');
+        return res.json();
+      })
+      .then(raw => {
+        const data = raw.map(rel => ({
+          version: rel.tag_name.replace(/^v/, ''),
+          date: rel.published_at,
+          notes: rel.body || 'Sin notas.',
+          url: (rel.assets[0] && rel.assets[0].browser_download_url) || rel.html_url
+        }));
+
+        if (data.length === 0) {
+          document.getElementById('actualizaciones').innerHTML = '<p class="sin-version">No hay versiones publicadas.</p>';
+          return;
+        }
+
+        // Orden semver descendente
+        data.sort((a, b) => {
+          const pa = a.version.split('.').map(n => parseInt(n));
+          const pb = b.version.split('.').map(n => parseInt(n));
+          for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+            const na = pa[i] || 0;
+            const nb = pb[i] || 0;
+            if (nb !== na) return nb - na;
+          }
+          return 0;
+        });
+
+        const select = document.getElementById('version-select');
+        while (select.options.length > 1) {
+          select.remove(1);
+        }
+
+        data.forEach(v => {
+          const opt = document.createElement('option');
+          opt.value = v.version;
+          opt.textContent = 'v' + v.version;
+          select.appendChild(opt);
+        });
+
+        select.addEventListener('change', () => {
+          const selected = select.value;
+          const v = data.find(item => item.version === selected);
+
+          // Parsear notas Markdown a HTML
+          const notasHtml = marked.parse(v.notes);
+
+          const container = document.createElement('div');
+          container.className = 'cuadro';
+
+          container.innerHTML = `
+            <h2>
+              <a href="https://github.com/VictorGugug/ROAFK/releases/tag/v${v.version}" class="release-link" target="_blank">
+                Versión v${v.version}
+              </a> 
+              <span class="version-num">${v.version}</span>
+            </h2>
+            <p class="fecha"><span class="icon-fecha">📅</span> ${formatDate(v.date)} (${timeAgo(v.date)})</p>
+            <p class="notas"><span class="icon-notas">📝</span></p>
+          `;
+
+          // Insertar notas con posible truncamiento
+          const notasContainer = createExpandableMarkdown(notasHtml);
+          container.appendChild(notasContainer);
+
+          const botonDescarga = document.createElement('a');
+          botonDescarga.className = 'boton-descarga';
+          botonDescarga.href = v.url;
+          botonDescarga.target = '_blank';
+          botonDescarga.textContent = '⬇️ Descargar';
+
+          container.appendChild(botonDescarga);
+
+          const actualizacionesDiv = document.getElementById('actualizaciones');
+          actualizacionesDiv.innerHTML = '';
+          actualizacionesDiv.appendChild(container);
+        });
+
+        // Mostrar versión más reciente por defecto
+        select.value = data[0].version;
+        select.dispatchEvent(new Event('change'));
+      })
+      .catch(err => {
+        document.getElementById('actualizaciones').innerHTML = `<p class="sin-version">${err.message}</p>`;
+      });
   </script>
 </body>
 </html>
