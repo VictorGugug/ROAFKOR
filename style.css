@@ -1,211 +1,107 @@
-/* --- Fondo y texto base --- */
 body {
   background-color: #0d1117;
   color: #c9d1d9;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-  line-height: 1.5;
-  margin: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
-/* Contenedor principal para que no esté pegado a los bordes */
 .main-container {
-  max-width: 720px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 20px;
-  background-color: #0d1117;
 }
 
-/* --- Encabezados (h1-h6) --- */
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
-  margin-top: 1.5em;
-  margin-bottom: 0.5em;
-  color: #c9d1d9;
-  line-height: 1.25;
-}
-
-h1 { font-size: 2em; border-bottom: 1px solid #30363d; padding-bottom: 0.3em; }
-h2 { font-size: 1.5em; border-bottom: 1px solid #30363d; padding-bottom: 0.3em; }
-h3 { font-size: 1.25em; }
-h4 { font-size: 1em; }
-h5 { font-size: 0.875em; }
-h6 { font-size: 0.85em; color: #8b949e; }
-
-/* --- Párrafos --- */
-p {
-  margin-top: 0;
-  margin-bottom: 1em;
-}
-
-/* --- Enlaces --- */
-a {
-  color: #58a6ff;
-  text-decoration: none;
-  cursor: pointer;
-}
-a:hover {
-  text-decoration: underline;
-}
-
-/* --- Listas --- */
-ul, ol {
-  padding-left: 2em;
-  margin-top: 0;
-  margin-bottom: 1em;
-}
-
-li + li {
-  margin-top: 0.25em;
-}
-
-/* --- Código en línea --- */
-code {
-  background-color: #161b22;
-  color: #ff7b72;
-  padding: 0.2em 0.4em;
-  margin: 0;
-  font-size: 85%;
-  border-radius: 6px;
-  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
-}
-
-/* --- Bloques de código --- */
-pre {
-  background-color: #161b22;
-  padding: 1em;
-  overflow: auto;
-  font-size: 85%;
-  line-height: 1.45;
-  border-radius: 6px;
-  margin-top: 0;
-  margin-bottom: 1em;
-  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
-  color: #c9d1d9;
-  border: 1px solid #30363d;
-  white-space: pre-wrap;
-}
-
-pre > code {
-  background: transparent;
-  padding: 0;
-  margin: 0;
-  font-size: inherit;
-  color: inherit;
-  white-space: pre-wrap;
-}
-
-/* --- Citas (blockquote) --- */
-blockquote {
-  margin: 0 0 1em;
-  padding-left: 1em;
-  color: #8b949e;
-  border-left: 0.25em solid #30363d;
-}
-
-/* --- Tablas --- */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 1em;
-  font-size: 85%;
-  color: #c9d1d9;
-}
-th, td {
-  border: 1px solid #30363d;
-  padding: 6px 13px;
-}
-th {
-  background-color: #161b22;
-  font-weight: 600;
-  text-align: left;
-}
-
-/* --- Negritas y cursivas --- */
-strong, b {
-  font-weight: 600;
-  color: #c9d1d9;
-}
-
-em, i {
-  font-style: italic;
-  color: #8b949e;
-}
-
-/* --- Contenedor para contenido truncado --- */
-.notas-markdown-container {
-  position: relative;
-}
-
-.notas-markdown {
-  white-space: pre-wrap;
-  line-height: 1.5em;
-  max-width: 100%;
-  color: #c9d1d9;
-}
-
-/* Botón "Ver más / Ver menos" */
-.ver-mas-btn {
-  margin-top: 0.5em;
-  background-color: transparent;
-  border: none;
-  color: #58a6ff;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.9em;
-  user-select: none;
-  transition: color 0.2s;
-  padding: 0;
-}
-.ver-mas-btn:hover {
-  color: #1f6feb;
-}
-
-/* Extras para íconos en fechas y notas */
-.icon-fecha, .icon-notas {
-  margin-right: 5px;
-}
-
-/* Estilo para el cuadro que contiene cada versión */
-.cuadro {
-  padding: 15px 20px;
-  border: 1px solid #30363d;
-  border-radius: 8px;
-  background-color: #161b22;
-  margin-top: 20px;
-}
-
-/* Botón descarga */
-.boton-descarga {
-  display: inline-block;
-  margin-top: 15px;
-  padding: 8px 16px;
-  background-color: #238636;
-  color: white;
-  font-weight: 600;
-  border-radius: 6px;
-  text-decoration: none;
-  transition: background-color 0.3s;
-}
-.boton-descarga:hover {
-  background-color: #2ea043;
-}
-
-/* Select versión */
-select#version-select {
-  padding: 8px 12px;
-  font-size: 1em;
-  border-radius: 6px;
-  border: 1px solid #30363d;
-  background-color: #0d1117;
-  color: #c9d1d9;
-  cursor: pointer;
-}
-
-/* Header container */
 .header-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
+  background-color: #161b22;
+  padding: 20px;
+  border-bottom: 1px solid #30363d;
+}
+
+h1 {
+  font-size: 1.8em;
+  color: #58a6ff;
+  margin: 0;
+}
+
+.dropdown select {
+  padding: 5px 10px;
+  background-color: #0d1117;
+  color: #c9d1d9;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+}
+
+.cuadro {
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.cuadro h2 {
+  margin-top: 0;
+  color: #58a6ff;
+}
+
+.version-num {
+  font-weight: normal;
+  color: #8b949e;
+  margin-left: 10px;
+}
+
+.fecha {
+  font-size: 0.9em;
+  color: #8b949e;
+}
+
+.notas-markdown-container {
+  margin-top: 10px;
+}
+
+.notas-markdown {
+  overflow-x: auto;
+  padding: 10px;
+  background-color: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+}
+
+.boton-descarga {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 10px 15px;
+  background-color: #238636;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+.boton-descarga:hover {
+  background-color: #2ea043;
+}
+
+.ver-mas-btn {
+  margin-top: 10px;
+  background-color: transparent;
+  border: 1px solid #30363d;
+  color: #c9d1d9;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.ver-mas-btn:hover {
+  background-color: #21262d;
+}
+
+.sin-version, .cargando {
+  text-align: center;
+  color: #8b949e;
+  font-style: italic;
 }
