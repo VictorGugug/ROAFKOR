@@ -20,13 +20,11 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
-    const apiUrl = 'https://api.github.com/repos/VictorGugug/ROAFK/releases';
-
     function formatDate(dateStr) {
       return new Date(dateStr).toISOString().slice(0, 10);
     }
-
     function timeAgo(dateStr) {
       const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
       if (diff < 60) return diff + 's atrás';
@@ -35,6 +33,36 @@
       return Math.floor(diff / 86400) + 'd atrás';
     }
 
+    function createExpandableMarkdown(htmlContent, maxHeight = 200) {
+      const container = document.createElement('div');
+      container.className = 'notas-markdown-container';
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'notas-markdown';
+      contentDiv.innerHTML = htmlContent;
+      container.appendChild(contentDiv);
+
+      if (contentDiv.scrollHeight > maxHeight) {
+        contentDiv.style.maxHeight = maxHeight + 'px';
+        contentDiv.style.overflow = 'hidden';
+        const btn = document.createElement('button');
+        btn.className = 'ver-mas-btn';
+        btn.textContent = 'Ver más';
+        btn.onclick = () => {
+          if (btn.textContent === 'Ver más') {
+            contentDiv.style.maxHeight = 'none';
+            btn.textContent = 'Ver menos';
+          } else {
+            contentDiv.style.maxHeight = maxHeight + 'px';
+            btn.textContent = 'Ver más';
+            contentDiv.scrollIntoView({behavior: 'smooth'});
+          }
+        };
+        container.appendChild(btn);
+      }
+      return container;
+    }
+
+    const apiUrl = 'https://api.github.com/repos/VictorGugug/ROAFK/releases';
     fetch(apiUrl)
       .then(res => {
         if (!res.ok) throw new Error('No se pudieron obtener las releases.');
@@ -44,6 +72,7 @@
         const data = raw.map(rel => ({
           version: rel.tag_name.replace(/^v/, ''),
           date: rel.published_at,
+          notes: rel.body || 'Sin notas.',
           url: (rel.assets[0] && rel.assets[0].browser_download_url) || rel.html_url
         }));
 
@@ -78,28 +107,26 @@
         select.addEventListener('change', () => {
           const selected = select.value;
           const v = data.find(item => item.version === selected);
-
+          const notasHtml = marked.parse(v.notes);
           const container = document.createElement('div');
           container.className = 'cuadro';
-
           container.innerHTML = `
             <h2>
               <a href="https://github.com/VictorGugug/ROAFK/releases/tag/v${v.version}" class="release-link" target="_blank">
                 Versión v${v.version}
-              </a>
+              </a> 
               <span class="version-num">${v.version}</span>
             </h2>
             <p class="fecha"><span class="icon-fecha">📅</span> ${formatDate(v.date)} (${timeAgo(v.date)})</p>
           `;
-
+          const notasContainer = createExpandableMarkdown(notasHtml);
+          container.appendChild(notasContainer);
           const botonDescarga = document.createElement('a');
           botonDescarga.className = 'boton-descarga';
           botonDescarga.href = v.url;
           botonDescarga.target = '_blank';
           botonDescarga.textContent = '⬇️ Descargar';
-
           container.appendChild(botonDescarga);
-
           const actualizacionesDiv = document.getElementById('actualizaciones');
           actualizacionesDiv.innerHTML = '';
           actualizacionesDiv.appendChild(container);
