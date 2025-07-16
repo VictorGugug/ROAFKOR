@@ -20,14 +20,13 @@
     </div>
   </div>
 
-  <!-- Incluir marked.js para parsear Markdown -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
   <script>
-    // Formateo de fecha y tiempo transcurrido
+    const apiUrl = 'https://api.github.com/repos/VictorGugug/ROAFK/releases';
+
     function formatDate(dateStr) {
       return new Date(dateStr).toISOString().slice(0, 10);
     }
+
     function timeAgo(dateStr) {
       const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
       if (diff < 60) return diff + 's atrás';
@@ -36,45 +35,6 @@
       return Math.floor(diff / 86400) + 'd atrás';
     }
 
-    // Función para truncar texto y crear botón "Ver más / Ver menos"
-    function createExpandableMarkdown(htmlContent, maxHeight = 200) {
-      // Crear contenedor
-      const container = document.createElement('div');
-      container.className = 'notas-markdown-container';
-
-      // Contenido markdown parseado
-      const contentDiv = document.createElement('div');
-      contentDiv.className = 'notas-markdown';
-      contentDiv.innerHTML = htmlContent;
-      container.appendChild(contentDiv);
-
-      // Si el contenido es muy alto, agregar botón para expandir
-      if (contentDiv.scrollHeight > maxHeight) {
-        contentDiv.style.maxHeight = maxHeight + 'px';
-        contentDiv.style.overflow = 'hidden';
-
-        const btn = document.createElement('button');
-        btn.className = 'ver-mas-btn';
-        btn.textContent = 'Ver más';
-
-        btn.onclick = () => {
-          if (btn.textContent === 'Ver más') {
-            contentDiv.style.maxHeight = 'none';
-            btn.textContent = 'Ver menos';
-          } else {
-            contentDiv.style.maxHeight = maxHeight + 'px';
-            btn.textContent = 'Ver más';
-            contentDiv.scrollIntoView({behavior: 'smooth'});
-          }
-        };
-
-        container.appendChild(btn);
-      }
-
-      return container;
-    }
-
-    const apiUrl = 'https://api.github.com/repos/VictorGugug/ROAFK/releases';
     fetch(apiUrl)
       .then(res => {
         if (!res.ok) throw new Error('No se pudieron obtener las releases.');
@@ -84,7 +44,6 @@
         const data = raw.map(rel => ({
           version: rel.tag_name.replace(/^v/, ''),
           date: rel.published_at,
-          notes: rel.body || 'Sin notas.',
           url: (rel.assets[0] && rel.assets[0].browser_download_url) || rel.html_url
         }));
 
@@ -93,7 +52,6 @@
           return;
         }
 
-        // Orden semver descendente
         data.sort((a, b) => {
           const pa = a.version.split('.').map(n => parseInt(n));
           const pb = b.version.split('.').map(n => parseInt(n));
@@ -121,9 +79,6 @@
           const selected = select.value;
           const v = data.find(item => item.version === selected);
 
-          // Parsear notas Markdown a HTML
-          const notasHtml = marked.parse(v.notes);
-
           const container = document.createElement('div');
           container.className = 'cuadro';
 
@@ -131,16 +86,11 @@
             <h2>
               <a href="https://github.com/VictorGugug/ROAFK/releases/tag/v${v.version}" class="release-link" target="_blank">
                 Versión v${v.version}
-              </a> 
+              </a>
               <span class="version-num">${v.version}</span>
             </h2>
             <p class="fecha"><span class="icon-fecha">📅</span> ${formatDate(v.date)} (${timeAgo(v.date)})</p>
-            <p class="notas"><span class="icon-notas">📝</span></p>
           `;
-
-          // Insertar notas con posible truncamiento
-          const notasContainer = createExpandableMarkdown(notasHtml);
-          container.appendChild(notasContainer);
 
           const botonDescarga = document.createElement('a');
           botonDescarga.className = 'boton-descarga';
@@ -155,7 +105,6 @@
           actualizacionesDiv.appendChild(container);
         });
 
-        // Mostrar versión más reciente por defecto
         select.value = data[0].version;
         select.dispatchEvent(new Event('change'));
       })
