@@ -1,104 +1,721 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Actualizaciones Roblox AFK Clicker</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Televisión CRT Retro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(0, 0, 0, 0.15),
+                    rgba(0, 0, 0, 0.15) 1px,
+                    transparent 1px,
+                    transparent 2px
+                );
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .tv-container {
+            position: relative;
+            width: 900px;
+            height: 700px;
+            background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.8),
+                inset 0 2px 5px rgba(255, 255, 255, 0.1);
+        }
+
+        .tv-frame {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            background: #1a1a1a;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 
+                inset 0 5px 15px rgba(0, 0, 0, 0.9),
+                0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .screen-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 
+                inset 0 0 50px rgba(0, 0, 0, 0.9),
+                0 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .screen {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .screen video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .screen video.active {
+            display: block;
+        }
+
+        .crt-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .crt-effect::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(0, 0, 0, 0.15),
+                    rgba(0, 0, 0, 0.15) 1px,
+                    transparent 1px,
+                    transparent 2px
+                );
+            animation: scanlines 8s linear infinite;
+        }
+
+        .crt-effect::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(
+                ellipse at center,
+                transparent 0%,
+                rgba(0, 0, 0, 0.4) 100%
+            );
+            animation: flicker 0.15s infinite;
+        }
+
+        @keyframes scanlines {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(10px); }
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.97; }
+            50% { opacity: 1; }
+            100% { opacity: 0.98; }
+        }
+
+        .static-noise {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii45IiBudW1PY3RhdmVzPSI0IiBzZWVkPSI1Ii8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iMSIvPjwvc3ZnPg==');
+            mix-blend-mode: overlay;
+            pointer-events: none;
+            z-index: 11;
+            transition: opacity 0.3s;
+        }
+
+        .static-noise.active {
+            opacity: 0.1;
+            animation: static 0.2s infinite;
+        }
+
+        @keyframes static {
+            0%, 100% { transform: translate(0, 0); }
+            10% { transform: translate(-1%, -1%); }
+            20% { transform: translate(1%, 1%); }
+            30% { transform: translate(-1%, 1%); }
+            40% { transform: translate(1%, -1%); }
+            50% { transform: translate(-1%, 0); }
+            60% { transform: translate(1%, 0); }
+            70% { transform: translate(0, 1%); }
+            80% { transform: translate(0, -1%); }
+            90% { transform: translate(1%, 1%); }
+        }
+
+        .controls-panel {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            border-radius: 15px;
+            box-shadow: 
+                inset 0 2px 5px rgba(0, 0, 0, 0.5),
+                0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .power-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ff4444, #cc0000);
+            border: 3px solid #666;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+            box-shadow: 
+                0 5px 15px rgba(255, 0, 0, 0.3),
+                inset 0 -2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .power-button:hover {
+            transform: scale(1.05);
+            box-shadow: 
+                0 8px 20px rgba(255, 0, 0, 0.5),
+                inset 0 -2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .power-button.on {
+            background: radial-gradient(circle, #44ff44, #00cc00);
+            box-shadow: 
+                0 5px 15px rgba(0, 255, 0, 0.3),
+                inset 0 -2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .power-button::before {
+            content: '⏻';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .knobs-container {
+            display: flex;
+            gap: 30px;
+        }
+
+        .knob-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .knob {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #4a4a4a, #2a2a2a);
+            border: 2px solid #333;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 
+                0 3px 10px rgba(0, 0, 0, 0.5),
+                inset 0 1px 2px rgba(255, 255, 255, 0.1);
+        }
+
+        .knob::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 3px;
+            height: 15px;
+            background: #fff;
+            border-radius: 2px;
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+
+        .knob-label {
+            color: #888;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .channel-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .channel-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .channel-btn {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
+            border: 2px solid #444;
+            border-radius: 5px;
+            color: #888;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .channel-btn:hover {
+            background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .channel-btn.active {
+            background: linear-gradient(145deg, #00cc00, #008800);
+            color: white;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .volume-slider {
+            width: 100px;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .volume-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00cc00, #44ff44);
+            border-radius: 3px;
+            width: 50%;
+            transition: width 0.2s;
+        }
+
+        .volume-icon {
+            color: #888;
+            font-size: 20px;
+        }
+
+        .off-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #333;
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            display: none;
+        }
+
+        .off-screen.active {
+            display: block;
+        }
+
+        .brand-label {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #555;
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .curve-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            box-shadow: 
+                inset 0 0 40px rgba(0, 0, 0, 0.5),
+                inset 0 0 80px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        @media (max-width: 768px) {
+            .tv-container {
+                width: 95vw;
+                height: 90vh;
+                padding: 20px;
+            }
+            
+            .controls-panel {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .knobs-container {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="main-container">
-    <div class="header-container">
-      <h1>Actualizaciones Roblox AFK Clicker</h1>
-      <div class="dropdown">
-        <select id="version-select">
-          <option value="" disabled selected hidden>Seleccionar versión</option>
-        </select>
-      </div>
+    <div class="tv-container">
+        <div class="tv-frame">
+            <div class="screen-container">
+                <div class="screen" id="screen">
+                    <video id="video1" class="active">
+                        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                    </video>
+                    <video id="video2">
+                        <source src="https://www.w3schools.com/html/movie.mp4" type="video/mp4">
+                    </video>
+                    <video id="video3">
+                        <source src="https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_1mb.mp4" type="video/mp4">
+                    </video>
+                    <div class="off-screen" id="offScreen">Sin Señal</div>
+                    <div class="crt-effect"></div>
+                    <div class="static-noise" id="staticNoise"></div>
+                    <div class="curve-effect"></div>
+                </div>
+            </div>
+            <div class="brand-label">RETRO-VISION</div>
+        </div>
+        
+        <div class="controls-panel">
+            <div class="power-button" id="powerBtn"></div>
+            
+            <div class="knobs-container">
+                <div class="knob-group">
+                    <div class="knob" id="brightnessKnob"></div>
+                    <span class="knob-label">Brillo</span>
+                </div>
+                <div class="knob-group">
+                    <div class="knob" id="contrastKnob"></div>
+                    <span class="knob-label">Contraste</span>
+                </div>
+                <div class="knob-group">
+                    <div class="knob" id="saturationKnob"></div>
+                    <span class="knob-label">Saturación</span>
+                </div>
+            </div>
+            
+            <div class="channel-selector">
+                <span class="knob-label">Canales</span>
+                <div class="channel-buttons">
+                    <button class="channel-btn active" data-channel="1">1</button>
+                    <button class="channel-btn" data-channel="2">2</button>
+                    <button class="channel-btn" data-channel="3">3</button>
+                    <button class="channel-btn" data-channel="4">4</button>
+                    <button class="channel-btn" data-channel="5">5</button>
+                    <button class="channel-btn" data-channel="6">6</button>
+                </div>
+            </div>
+            
+            <div class="volume-control">
+                <span class="volume-icon">🔊</span>
+                <div class="volume-slider" id="volumeSlider">
+                    <div class="volume-fill" id="volumeFill"></div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div id="actualizaciones">
-      <p class="cargando">Cargando información de versiones...</p>
-    </div>
-  </div>
 
-  <script>
-    // Formateo de fecha y tiempo transcurrido
-    function formatDate(dateStr) {
-      return new Date(dateStr).toISOString().slice(0, 10);
-    }
-    function timeAgo(dateStr) {
-      const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
-      if (diff < 60) return diff + 's atrás';
-      if (diff < 3600) return Math.floor(diff / 60) + 'm atrás';
-      if (diff < 86400) return Math.floor(diff / 3600) + 'h atrás';
-      return Math.floor(diff / 86400) + 'd atrás';
-    }
-
-    const apiUrl = 'https://api.github.com/repos/VictorGugug/ROAFK/releases';
-    fetch(apiUrl)
-      .then(res => {
-        if (!res.ok) throw new Error('No se pudieron obtener las releases.');
-        return res.json();
-      })
-      .then(raw => {
-        // Mapear datos y extraer
-        const data = raw.map(rel => ({
-          version: rel.tag_name.replace(/^v/, ''),
-          date: rel.published_at,
-          notes: rel.body || 'Sin notas.',
-          url: (rel.assets[0] && rel.assets[0].browser_download_url) || rel.html_url
-        }));
-
-        if (data.length === 0) {
-          document.getElementById('actualizaciones').innerHTML = '<p class="sin-version">No hay versiones publicadas.</p>';
-          return;
+    <script>
+        class CRTTV {
+            constructor() {
+                this.isOn = false;
+                this.currentChannel = 1;
+                this.brightness = 100;
+                this.contrast = 100;
+                this.saturation = 100;
+                this.volume = 0.5;
+                
+                this.initElements();
+                this.initEventListeners();
+                this.initKnobs();
+            }
+            
+            initElements() {
+                this.powerBtn = document.getElementById('powerBtn');
+                this.screen = document.getElementById('screen');
+                this.offScreen = document.getElementById('offScreen');
+                this.staticNoise = document.getElementById('staticNoise');
+                this.videos = document.querySelectorAll('video');
+                this.channelBtns = document.querySelectorAll('.channel-btn');
+                this.volumeSlider = document.getElementById('volumeSlider');
+                this.volumeFill = document.getElementById('volumeFill');
+                
+                this.brightnessKnob = document.getElementById('brightnessKnob');
+                this.contrastKnob = document.getElementById('contrastKnob');
+                this.saturationKnob = document.getElementById('saturationKnob');
+            }
+            
+            initEventListeners() {
+                this.powerBtn.addEventListener('click', () => this.togglePower());
+                
+                this.channelBtns.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        if (this.isOn) {
+                            this.changeChannel(parseInt(e.target.dataset.channel));
+                        }
+                    });
+                });
+                
+                this.volumeSlider.addEventListener('click', (e) => {
+                    if (this.isOn) {
+                        const rect = this.volumeSlider.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
+                        this.setVolume(percentage / 100);
+                    }
+                });
+            }
+            
+            initKnobs() {
+                this.initKnob(this.brightnessKnob, 'brightness');
+                this.initKnob(this.contrastKnob, 'contrast');
+                this.initKnob(this.saturationKnob, 'saturation');
+            }
+            
+            initKnob(knob, type) {
+                let isDragging = false;
+                let startAngle = 0;
+                let currentAngle = 0;
+                
+                const updateKnob = (e) => {
+                    if (!isDragging) return;
+                    
+                    const rect = knob.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    
+                    const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
+                    const degrees = angle * (180 / Math.PI) + 90;
+                    
+                    let normalizedDegrees = degrees;
+                    if (normalizedDegrees < 0) normalizedDegrees += 360;
+                    if (normalizedDegrees > 360) normalizedDegrees -= 360;
+                    
+                    const value = Math.round((normalizedDegrees / 360) * 200);
+                    const clampedValue = Math.max(0, Math.min(200, value));
+                    
+                    knob.style.transform = `rotate(${normalizedDegrees}deg)`;
+                    
+                    switch(type) {
+                        case 'brightness':
+                            this.setBrightness(clampedValue);
+                            break;
+                        case 'contrast':
+                            this.setContrast(clampedValue);
+                            break;
+                        case 'saturation':
+                            this.setSaturation(clampedValue);
+                            break;
+                    }
+                };
+                
+                knob.addEventListener('mousedown', (e) => {
+                    if (!this.isOn) return;
+                    isDragging = true;
+                    const rect = knob.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    startAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
+                });
+                
+                document.addEventListener('mousemove', updateKnob);
+                document.addEventListener('mouseup', () => {
+                    isDragging = false;
+                });
+                
+                knob.addEventListener('touchstart', (e) => {
+                    if (!this.isOn) return;
+                    isDragging = true;
+                    const touch = e.touches[0];
+                    const rect = knob.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    startAngle = Math.atan2(touch.clientY - centerY, touch.clientX - centerX);
+                });
+                
+                document.addEventListener('touchmove', (e) => {
+                    if (!isDragging) return;
+                    const touch = e.touches[0];
+                    updateKnob(touch);
+                });
+                
+                document.addEventListener('touchend', () => {
+                    isDragging = false;
+                });
+            }
+            
+            togglePower() {
+                this.isOn = !this.isOn;
+                
+                if (this.isOn) {
+                    this.powerOn();
+                } else {
+                    this.powerOff();
+                }
+            }
+            
+            powerOn() {
+                this.powerBtn.classList.add('on');
+                this.offScreen.classList.remove('active');
+                this.staticNoise.classList.add('active');
+                
+                setTimeout(() => {
+                    this.staticNoise.classList.remove('active');
+                    this.playCurrentChannel();
+                }, 500);
+                
+                this.applyFilters();
+            }
+            
+            powerOff() {
+                this.powerBtn.classList.remove('on');
+                this.offScreen.classList.add('active');
+                this.staticNoise.classList.add('active');
+                
+                this.videos.forEach(video => {
+                    video.pause();
+                    video.classList.remove('active');
+                });
+                
+                setTimeout(() => {
+                    this.staticNoise.classList.remove('active');
+                }, 300);
+            }
+            
+            changeChannel(channel) {
+                this.currentChannel = channel;
+                
+                this.staticNoise.classList.add('active');
+                
+                setTimeout(() => {
+                    this.videos.forEach(video => {
+                        video.pause();
+                        video.classList.remove('active');
+                    });
+                    
+                    this.channelBtns.forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    const activeBtn = document.querySelector(`[data-channel="${channel}"]`);
+                    if (activeBtn) {
+                        activeBtn.classList.add('active');
+                    }
+                    
+                    this.playCurrentChannel();
+                    this.staticNoise.classList.remove('active');
+                }, 200);
+            }
+            
+            playCurrentChannel() {
+                const videoIndex = (this.currentChannel - 1) % this.videos.length;
+                const video = this.videos[videoIndex];
+                
+                if (video) {
+                    video.classList.add('active');
+                    video.volume = this.volume;
+                    video.play().catch(e => {
+                        console.log('Error al reproducir video:', e);
+                    });
+                }
+            }
+            
+            setBrightness(value) {
+                this.brightness = value;
+                this.applyFilters();
+            }
+            
+            setContrast(value) {
+                this.contrast = value;
+                this.applyFilters();
+            }
+            
+            setSaturation(value) {
+                this.saturation = value;
+                this.applyFilters();
+            }
+            
+            setVolume(value) {
+                this.volume = value;
+                this.volumeFill.style.width = `${value * 100}%`;
+                
+                this.videos.forEach(video => {
+                    video.volume = value;
+                });
+            }
+            
+            applyFilters() {
+                const filterString = `
+                    brightness(${this.brightness}%) 
+                    contrast(${this.contrast}%) 
+                    saturate(${this.saturation}%)
+                `;
+                
+                this.videos.forEach(video => {
+                    video.style.filter = filterString;
+                });
+            }
         }
-
-        // Orden semver descendente
-        data.sort((a, b) => {
-          const pa = a.version.split('.').map(n => parseInt(n));
-          const pb = b.version.split('.').map(n => parseInt(n));
-          for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
-            const na = pa[i] || 0;
-            const nb = pb[i] || 0;
-            if (nb !== na) return nb - na;
-          }
-          return 0;
+        
+        // Inicializar la televisión cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', () => {
+            const tv = new CRTTV();
         });
-
-        const select = document.getElementById('version-select');
-        // Limpiar opciones salvo placeholder
-        while (select.options.length > 1) {
-          select.remove(1);
-        }
-
-        // Agregar versiones al dropdown
-        data.forEach(v => {
-          const opt = document.createElement('option');
-          opt.value = v.version;
-          opt.textContent = 'v' + v.version;
-          select.appendChild(opt);
-        });
-
-        // Evento cambio para mostrar detalles
-        select.addEventListener('change', () => {
-          const selected = select.value;
-          const v = data.find(item => item.version === selected);
-          document.getElementById('actualizaciones').innerHTML =
-            `<div class="cuadro">
-               <h2><a href="https://github.com/VictorGugug/ROAFK/releases/tag/v${v.version}" class="release-link" target="_blank">Versión v${v.version}</a> <span class="version-num">${v.version}</span></h2>
-               <p class="fecha"><span class="icon-fecha">📅</span> ${formatDate(v.date)} (${timeAgo(v.date)})</p>
-               <p class="notas"><span class="icon-notas">📝</span> ${v.notes}</p>
-               <a class="boton-descarga" href="${v.url}" target="_blank">⬇️ Descargar</a>
-             </div>`;
-        });
-
-        // Seleccionar y mostrar la más reciente
-        select.value = data[0].version;
-        select.dispatchEvent(new Event('change'));
-      })
-      .catch(err => {
-        document.getElementById('actualizaciones').innerHTML = `<p class="sin-version">${err.message}</p>`;
-      });
-  </script>
+    </script>
 </body>
 </html>
